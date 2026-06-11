@@ -109,6 +109,138 @@
       color: #0a0d0a;
     }
 
+    button.mailing-list {
+      cursor: pointer;
+    }
+
+    .signup {
+      position: fixed;
+      inset: 0;
+      margin: auto;
+      height: fit-content;
+      width: min(92vw, 440px);
+      padding: clamp(30px, 4vw, 46px) clamp(22px, 4vw, 48px);
+      border: 1px solid rgba(243, 241, 234, 0.85);
+      background: rgba(10, 13, 10, 0.97);
+      color: #f3f1ea;
+      text-align: center;
+    }
+
+    .signup::backdrop {
+      background: rgba(4, 6, 4, 0.65);
+      backdrop-filter: blur(3px);
+    }
+
+    .signup-close {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      border: 0;
+      background: none;
+      color: rgba(243, 241, 234, 0.7);
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .signup-close:hover,
+    .signup-close:focus-visible {
+      color: #f3f1ea;
+    }
+
+    .signup h2 {
+      font-size: clamp(15px, 1.4vw, 19px);
+      font-weight: 700;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+    }
+
+    .signup-sub {
+      margin-top: 14px;
+      font-size: clamp(10px, 1vw, 12px);
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      line-height: 1.9;
+      text-transform: uppercase;
+      color: rgba(243, 241, 234, 0.8);
+    }
+
+    .signup form {
+      margin-top: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .gotcha {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .signup-email {
+      padding: 0.9em 1em;
+      border: 1px solid rgba(243, 241, 234, 0.55);
+      background: transparent;
+      color: #f3f1ea;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .signup-email::placeholder {
+      color: rgba(243, 241, 234, 0.45);
+    }
+
+    .signup-email:focus {
+      outline: 1px solid #f3f1ea;
+      outline-offset: 1px;
+    }
+
+    .signup-submit {
+      padding: 0.9em 1em;
+      border: 1px solid rgba(243, 241, 234, 0.85);
+      background: #f3f1ea;
+      color: #0a0d0a;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .signup-submit:hover,
+    .signup-submit:focus-visible {
+      background: transparent;
+      color: #f3f1ea;
+    }
+
+    .signup-submit:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .signup-status {
+      margin-top: 16px;
+      min-height: 1.2em;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      line-height: 1.8;
+      text-transform: uppercase;
+    }
+
+    .signup-status:empty {
+      margin-top: 0;
+      min-height: 0;
+    }
+
     @media (max-width: 700px) {
       .hero {
         background-image: url("miso-modern-mobile-splash.jpg");
@@ -144,8 +276,87 @@
         contact<br />
         <a href="mailto:sweva@misomodern.com">sweva@misomodern.com</a>
       </p>
-      <a class="mailing-list" href="mailto:sweva@misomodern.com?subject=Join%20the%20mailing%20list">Join the mailing list</a>
+      <button class="mailing-list" type="button" id="open-signup">Join the mailing list</button>
     </div>
   </main>
+
+  <dialog class="signup" id="signup" aria-labelledby="signup-title">
+    <button class="signup-close" type="button" aria-label="Close">&times;</button>
+    <h2 id="signup-title">Join the mailing list</h2>
+    <p class="signup-sub">Be the first to hear about The Green Steps &mdash; exhibition dates, previews, and prints.</p>
+    <form id="signup-form" novalidate>
+      <input class="gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <input class="signup-email" type="email" name="email" required placeholder="Your email" autocomplete="email" aria-label="Email address" />
+      <button class="signup-submit" type="submit">Subscribe</button>
+    </form>
+    <p class="signup-status" role="status" aria-live="polite"></p>
+  </dialog>
+
+  <script>
+    // Formspree endpoint — replace YOUR_FORM_ID with the real form ID
+    var FORM_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
+
+    var dialog = document.getElementById("signup");
+    var form = document.getElementById("signup-form");
+    var emailInput = form.querySelector(".signup-email");
+    var submitBtn = form.querySelector(".signup-submit");
+    var statusEl = dialog.querySelector(".signup-status");
+
+    function openSignup() {
+      if (!dialog.open) {
+        dialog.showModal();
+        emailInput.focus();
+      }
+    }
+
+    document.getElementById("open-signup").addEventListener("click", openSignup);
+    dialog.querySelector(".signup-close").addEventListener("click", function () { dialog.close(); });
+    dialog.addEventListener("click", function (e) {
+      if (e.target === dialog) dialog.close();
+    });
+    dialog.addEventListener("close", function () {
+      try { localStorage.setItem("misoSignupSeen", "1"); } catch (e) {}
+    });
+
+    var seen = false;
+    try {
+      seen = localStorage.getItem("misoSignupSeen") || localStorage.getItem("misoSubscribed");
+    } catch (e) {}
+    if (!seen) setTimeout(openSignup, 4000);
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!emailInput.checkValidity()) {
+        statusEl.textContent = "Please enter a valid email address.";
+        emailInput.focus();
+        return;
+      }
+      if (FORM_ENDPOINT.indexOf("YOUR_FORM_ID") !== -1) {
+        // Endpoint not configured yet — fall back to a pre-filled email
+        window.location.href = "mailto:sweva@misomodern.com" +
+          "?subject=" + encodeURIComponent("Mailing list signup") +
+          "&body=" + encodeURIComponent("Please add me to the mailing list: " + emailInput.value);
+        statusEl.textContent = "Opening your email app to complete signup…";
+        return;
+      }
+      statusEl.textContent = "Sending…";
+      submitBtn.disabled = true;
+      fetch(FORM_ENDPOINT, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { Accept: "application/json" }
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error("bad status");
+          form.hidden = true;
+          statusEl.textContent = "Thank you — you're on the list.";
+          try { localStorage.setItem("misoSubscribed", "1"); } catch (e) {}
+        })
+        .catch(function () {
+          submitBtn.disabled = false;
+          statusEl.textContent = "Something went wrong — please email sweva@misomodern.com";
+        });
+    });
+  </script>
 </body>
 </html>
