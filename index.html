@@ -9,22 +9,69 @@
   <meta property="og:description" content="A series about presence, not perfection. Same place. Different truth. Exhibition coming soon." />
   <meta property="og:image" content="miso-modern-splash.jpg" />
   <meta property="og:type" content="website" />
-  <link rel="preload" as="image" href="miso-modern-splash.jpg" />
+  <link rel="preload" as="image" href="miso-modern-splash.jpg" media="(min-width: 701px)" />
+  <link rel="preload" as="image" href="miso-modern-mobile-splash.jpg" media="(max-width: 700px)" />
+  <link rel="preload" as="image" href="miso-modern-global-logo.png" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { min-height: 100%; }
+    html, body {
+      width: 100%;
+      min-height: 100%;
+    }
+
     body {
       background: #0a0d0a;
       font-family: "Helvetica Neue", Arial, sans-serif;
+      overflow: hidden;
     }
-    .splash {
-      display: block;
+
+    .hero {
+      position: relative;
+      display: grid;
+      place-items: center;
       width: 100vw;
+      min-height: 100vh;
+      min-height: 100svh;
+      isolation: isolate;
+      overflow: hidden;
+      background-image: url("miso-modern-splash.jpg");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at center, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.18) 62%, rgba(0, 0, 0, 0.42));
+      pointer-events: none;
+    }
+
+    .logo {
+      display: block;
+      width: clamp(170px, 23vw, 320px);
       height: auto;
+      filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.48));
+    }
+
+    @media (max-width: 700px) {
+      .hero {
+        background-image: url("miso-modern-mobile-splash.jpg");
+        background-position: center;
+      }
+
+      .logo {
+        width: clamp(145px, 43vw, 230px);
+      }
     }
   </style>
 </head>
 <body>
-  <img class="splash" src="miso-modern-splash.jpg" alt="Miso Modern Global — The Green Steps. A series about presence, not perfection. Same place. Different truth. Exhibition coming soon." />
+  <main class="hero" aria-label="Miso Modern Global — The Green Steps exhibition coming soon">
+    <img class="logo" src="miso-modern-global-logo.png" alt="Miso Modern Global" />
+  </main>
 </body>
 </html>
