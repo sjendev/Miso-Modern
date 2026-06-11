@@ -293,8 +293,7 @@
   </dialog>
 
   <script>
-    // Formspree endpoint — replace YOUR_FORM_ID with the real form ID
-    var FORM_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
+    var FORM_ENDPOINT = "https://formspree.io/f/mpqejdee";
 
     var dialog = document.getElementById("signup");
     var form = document.getElementById("signup-form");
@@ -329,14 +328,6 @@
       if (!emailInput.checkValidity()) {
         statusEl.textContent = "Please enter a valid email address.";
         emailInput.focus();
-        return;
-      }
-      if (FORM_ENDPOINT.indexOf("YOUR_FORM_ID") !== -1) {
-        // Endpoint not configured yet — fall back to a pre-filled email
-        window.location.href = "mailto:sweva@misomodern.com" +
-          "?subject=" + encodeURIComponent("Mailing list signup") +
-          "&body=" + encodeURIComponent("Please add me to the mailing list: " + emailInput.value);
-        statusEl.textContent = "Opening your email app to complete signup…";
         return;
       }
       statusEl.textContent = "Sending…";
